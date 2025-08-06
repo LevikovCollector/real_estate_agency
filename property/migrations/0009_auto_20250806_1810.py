@@ -7,7 +7,11 @@ import phonenumbers
 def update_owner_pure_phone(apps, schema_editor):
     Flat = apps.get_model("property", "Flat")
     for flat in Flat.objects.all():
-        phone = f"+7{phonenumbers.parse(flat.owners_phonenumber, 'RU').national_number}"
+        national_num = phonenumbers.parse(flat.owners_phonenumber, 'RU').national_number
+        if national_num == 0:
+            phone = None
+        else:
+            phone = f"+7{national_num}"
         flat.owner_pure_phone = phone
         flat.save()
 
