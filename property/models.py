@@ -61,3 +61,11 @@ class Claim(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     flat = models.ForeignKey(Flat, on_delete=models.CASCADE)
     description = models.TextField(max_length=300)
+
+
+class Owner(models.Model):
+    owner = models.CharField('ФИО владельца', max_length=200)
+    owners_phonenumber = models.CharField('Номер владельца', max_length=20)
+    owner_pure_phone = PhoneNumberField(region="RU", blank=True, null=True, verbose_name="Нормальный номер владельца")
+    flat_owned = models.ManyToManyField("Flat", related_name="owners", verbose_name="Квартиры во владении")
+
