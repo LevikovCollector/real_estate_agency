@@ -6,8 +6,8 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 class Flat(models.Model):
     new_building = models.BooleanField(blank=True, null=True, help_text="Признак, является ли здание новостройкой",
-                                       verbose_name="Новостройка")
-    like_by = models.ManyToManyField(User, related_name="likes_flats", blank=True,  verbose_name="Лайки")
+                                       verbose_name="Новостройка", db_index=True)
+    like_by = models.ManyToManyField(User, related_name="flats_with_likes", blank=True,  verbose_name="Лайки")
     created_at = models.DateTimeField(
         'Когда создано объявление',
         default=timezone.now,
@@ -55,8 +55,8 @@ class Flat(models.Model):
 
 
 class Claim(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    flat = models.ForeignKey(Flat, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="claims")
+    flat = models.ForeignKey(Flat, on_delete=models.CASCADE, related_name="claims")
     description = models.TextField(max_length=300)
 
 
@@ -64,7 +64,8 @@ class Owner(models.Model):
     owner = models.CharField('ФИО владельца', max_length=200)
     owners_phonenumber = models.CharField('Номер владельца', max_length=20)
     owner_pure_phone = PhoneNumberField(region="RU", blank=True, null=True, verbose_name="Нормальный номер владельца")
-    flat_owned = models.ManyToManyField("Flat", related_name="owners", verbose_name="Квартиры во владении")
+    flat_owned = models.ManyToManyField("Flat", related_name="owners", verbose_name="Квартиры во владении",
+                                        blank=True)
 
     def __str__(self):
         return f'{self.owner}'

@@ -2,12 +2,18 @@
 
 from django.db import migrations
 import phonenumbers
+from phonenumbers import NumberParseException
 
 
 def update_owner_pure_phone(apps, schema_editor):
     Flat = apps.get_model("property", "Flat")
-    for flat in Flat.objects.all():
-        national_num = phonenumbers.parse(flat.owners_phonenumber, 'RU').national_number
+
+    for flat in Flat.objects.all().iterator(chunk_size=100):
+        try:
+            national_num = phonenumbers.parse(flat.owners_phonenumber, 'RU').national_number
+        except NumberParseException:
+            national_num = 0
+
         if national_num == 0:
             phone = None
         else:
